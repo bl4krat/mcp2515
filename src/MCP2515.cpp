@@ -152,13 +152,13 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
   
   // Calculate bit timing registers
   uint8_t BRP;
-  float TQ;
+  float   TQ;
   uint8_t BT;
-  float tempBT;
-  float freqMhz = Freq * 1000000.0;
-  float bestMatchf = 10.0;
-  int bestMatchIdx = 10;
-  float savedBT;
+  float   tempBT;
+  float   freqMhz      = Freq * 1000000.0;
+  float   bestMatchf   = 10.0;
+  int     bestMatchIdx = 10;
+  float   savedBT;
 
   float speed = CAN_Bus_Speed;
   if (speed > 5000.0) speed *= 0.001;
@@ -211,12 +211,16 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
   // Programming requirements
   if(PRSEG + PHSEG1 < PHSEG2) 
   {
+#ifdef DEBUG_SETUP
       SerialUSB.println("PRSEG + PHSEG1 less than PHSEG2!");
+#endif
       return false;
   }
   if(PHSEG2 <= SJW) 
   {
+#ifdef DEBUG_SETUP
       SerialUSB.println("PHSEG2 less than SJW");
+#endif
       return false;
   }
   
@@ -234,14 +238,18 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
     // Return to Normal mode
     if(!Mode(MODE_NORMAL)) 
     {
+#ifdef DEBUG_SETUP
         SerialUSB.println("Could not enter normal mode");
+#endif
         return false;
     }
   } else {
     // Set to Listen Only mode
     if(!Mode(MODE_LISTEN)) 
     {
+#ifdef DEBUG_SETUP
         SerialUSB.println("Could not enter listen only mode");
+#endif
         return false;
     }
   }
@@ -253,8 +261,10 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
   if (rtn == data) return true;
   else 
   {
+#ifdef DEBUG_SETUP
     SerialUSB.println(data, HEX);
     SerialUSB.println(rtn, HEX);
+#endif
     return false;
   }
 
