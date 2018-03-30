@@ -42,22 +42,22 @@ class MCP2515
 	// Constructor defining which pins to use for CS, RESET and INT
     MCP2515(uint8_t CS_Pin, uint8_t INT_Pin);
 	
-	// Overloaded initialization function
+	// Overloaded initialization functions
 	int Init(uint32_t baud, uint8_t freq);
 	int Init(uint32_t baud, uint8_t freq, uint8_t sjw);
 	
 	// Basic MCP2515 SPI Command Set
-    void Reset();
-    byte Read(uint8_t address);
-    void Read(uint8_t address, uint8_t data[], uint8_t bytes);
-	Frame ReadBuffer(uint8_t buffer);
-	void Write(uint8_t address, uint8_t data);
-	void Write(uint8_t address, uint8_t data[], uint8_t bytes);
-	void LoadBuffer(uint8_t buffer, Frame *message);
-	void SendBuffer(uint8_t buffers);
+    void    Reset();
+    byte    Read(uint8_t address);
+    void    Read(uint8_t address, uint8_t data[], uint8_t bytes);
+	Frame   ReadBuffer(uint8_t buffer);
+	void    Write(uint8_t address, uint8_t data);
+	void    Write(uint8_t address, uint8_t data[], uint8_t bytes);
+	void    LoadBuffer(uint8_t buffer, Frame *message);
+	void    SendBuffer(uint8_t buffers);
 	uint8_t Status();
 	uint8_t RXStatus();
-	void BitModify(uint8_t address, uint8_t mask, uint8_t data);
+	void    BitModify(uint8_t address, uint8_t mask, uint8_t data);
 
 	// Extra functions
 	bool Interrupt(); // Expose state of INT pin
@@ -70,10 +70,10 @@ class MCP2515
 	void InitFilters(bool permissive);
 	void intHandler();
 	void InitBuffers();
-	int watchFor(); //allow anything through
-	int watchFor(uint32_t id); //allow just this ID through (automatic determination of extended status)
-	int watchFor(uint32_t id, uint32_t mask); //allow a range of ids through
-	int watchForRange(uint32_t id1, uint32_t id2); //try to allow the range from id1 to id2 - automatically determine base ID and mask
+	int  watchFor(); //allow anything through
+	int  watchFor(uint32_t id); //allow just this ID through (automatic determination of extended status)
+	int  watchFor(uint32_t id, uint32_t mask); //allow a range of ids through
+	int  watchForRange(uint32_t id1, uint32_t id2); //try to allow the range from id1 to id2 - automatically determine base ID and mask
 	//void attachCANInterrupt(void (*cb)(CAN_FRAME *)); //alternative callname for setGeneralCallback
 	//void attachCANInterrupt(uint8_t filter, void (*cb)(CAN_FRAME *));
 	//void detachCANInterrupt(uint8_t filter);
@@ -81,15 +81,17 @@ class MCP2515
 
   private:
 	bool _init(uint32_t baud, uint8_t freq, uint8_t sjw, bool autoBaud);
+    
     // Pin variables
-	uint8_t _CS;
-	uint8_t _INT;
+	uint8_t  _CS;
+	uint8_t  _INT;
 	volatile uint16_t savedBaud;
-	volatile uint8_t savedFreq;
-	volatile uint8_t running; //1 if out of init code, 0 if still trying to initialize (auto baud detecting)
+	volatile uint8_t  savedFreq;
+	volatile uint8_t  running; //1 if out of init code, 0 if still trying to initialize (auto baud detecting)
+    
     // Definitions for software buffers
-	volatile Frame rx_frames[8];
-	volatile Frame tx_frames[8];
+	volatile Frame   rx_frames[8];
+	volatile Frame   tx_frames[8];
 	volatile uint8_t rx_frame_read_pos, rx_frame_write_pos;
 	volatile uint8_t tx_frame_read_pos, tx_frame_write_pos;
 	//void (*cbCANFrame[7])(Frame *); //6 filters plus an optional catch all

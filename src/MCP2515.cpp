@@ -46,15 +46,15 @@ MCP2515::MCP2515(uint8_t CS_Pin, uint8_t INT_Pin) {
   
   savedBaud = 0;
   savedFreq = 0;
-  running = 0; 
+  running   = 0; 
   InitBuffers();
 }
 
 //set all buffer counters to zero to reset them
 void MCP2515::InitBuffers() {
-  rx_frame_read_pos = 0;
+  rx_frame_read_pos  = 0;
   rx_frame_write_pos = 0;
-  tx_frame_read_pos = 0;
+  tx_frame_read_pos  = 0;
   tx_frame_write_pos = 0;
 }  
 
@@ -75,7 +75,7 @@ int MCP2515::Init(uint32_t CAN_Bus_Speed, uint8_t Freq) {
     if(_init(CAN_Bus_Speed, Freq, 1, false)) {
 		savedBaud = CAN_Bus_Speed;
 		savedFreq = Freq;
-		running = 1;
+		running   = 1;
 	    return CAN_Bus_Speed;
     }
   } else {
@@ -94,7 +94,7 @@ int MCP2515::Init(uint32_t CAN_Bus_Speed, uint8_t Freq) {
 		    Mode(MODE_NORMAL);
 			savedBaud = i;
 			savedFreq = Freq;	
-			running = 1;
+			running   = 1;
 			return i;
 		  }
 		}
@@ -111,7 +111,7 @@ int MCP2515::Init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW) {
     if(_init(CAN_Bus_Speed, Freq, SJW, false)) {
 		savedBaud = CAN_Bus_Speed;
 		savedFreq = Freq;
-		running = 1;
+		running   = 1;
 	    return CAN_Bus_Speed;
     }
   } else {
@@ -130,7 +130,7 @@ int MCP2515::Init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW) {
 		    Mode(MODE_NORMAL);
 			savedBaud = i;
 			savedFreq = Freq;
-			running = 1;
+			running   = 1;
 			return i;
 		  }
 		}
@@ -145,7 +145,7 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
   // Reset MCP2515 which puts it in configuration mode
   Reset();
 
-  Write(CANINTE,0); //disable all interrupts during init
+  Write(CANINTE,  0); //disable all interrupts during init
   Write(TXB0CTRL, 0); //reset transmit control
   Write(TXB1CTRL, 0); //reset transmit control
   Write(TXB2CTRL, 0); //reset transmit control
@@ -180,14 +180,14 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
     {
         if (BT > 7 && BT < 25)
         {
-            bestMatchf = (tempBT - BT);
+            bestMatchf   = (tempBT - BT);
             bestMatchIdx = BRP;
-            savedBT = BT;
+            savedBT      = BT;
         }
     }
   }
 
-  BT = savedBT;
+  BT  = savedBT;
   BRP = bestMatchIdx;
 #ifdef DEBUG_SETUP  
   SerialUSB.print("BRP: ");
@@ -196,8 +196,8 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
   SerialUSB.println(BT);
 #endif
   
-  byte SPT = (0.7 * BT); // Sample point
-  byte PRSEG = (SPT - 1) / 2;
+  byte SPT    = (0.7 * BT); // Sample point
+  byte PRSEG  = (SPT - 1) / 2;
   byte PHSEG1 = SPT - PRSEG - 1;
   byte PHSEG2 = BT - PHSEG1 - PRSEG - 1;
 #ifdef DEBUG_SETUP
@@ -225,7 +225,7 @@ bool MCP2515::_init(uint32_t CAN_Bus_Speed, uint8_t Freq, uint8_t SJW, bool auto
   }
   
   uint8_t BTLMODE = 1;
-  uint8_t SAMPLE = 0;
+  uint8_t SAMPLE  = 0;
   
   // Set registers
   byte data = (((SJW-1) << 6) | BRP);
@@ -535,11 +535,11 @@ void MCP2515::SetRXMask(uint8_t mask, long MaskValue, bool ext) {
 	Mode(MODE_CONFIG); //have to be in config mode to change mask
 	
 	if (ext) { //fill out all 29 bits
-		temp_buff[0] = byte((MaskValue << 3) >> 24);
-		temp_buff[1] = byte((MaskValue << 11) >> 24) & B11100000;
+		temp_buff[0]  = byte((MaskValue << 3) >> 24);
+		temp_buff[1]  = byte((MaskValue << 11) >> 24) & B11100000;
 		temp_buff[1] |= byte((MaskValue << 14) >> 30);
-		temp_buff[2] = byte((MaskValue << 16)>>24);
-		temp_buff[3] = byte((MaskValue << 24)>>24);
+		temp_buff[2]  = byte((MaskValue << 16)>>24);
+		temp_buff[3]  = byte((MaskValue << 24)>>24);
 	}
 	else { //make sure to set mask as 11 bit standard mask
 		temp_buff[0] = byte((MaskValue << 21)>>24);
@@ -569,12 +569,12 @@ void MCP2515::SetRXFilter(uint8_t filter, long FilterValue, bool ext) {
 	Mode(MODE_CONFIG); //have to be in config mode to change mask
 	
 	if (ext) { //fill out all 29 bits
-		temp_buff[0] = byte((FilterValue << 3) >> 24);
-		temp_buff[1] = byte((FilterValue << 11) >> 24) & B11100000;
+		temp_buff[0]  = byte((FilterValue << 3) >> 24);
+		temp_buff[1]  = byte((FilterValue << 11) >> 24) & B11100000;
 		temp_buff[1] |= byte((FilterValue << 14) >> 30);
 		temp_buff[1] |= B00001000; //set EXIDE
-		temp_buff[2] = byte((FilterValue << 16)>>24);
-		temp_buff[3] = byte((FilterValue << 24)>>24);
+		temp_buff[2]  = byte((FilterValue << 16)>>24);
+		temp_buff[3]  = byte((FilterValue << 24)>>24);
 	}
 	else { //make sure to set mask as 11 bit standard mask
 		temp_buff[0] = byte((FilterValue << 21)>>24);
@@ -737,7 +737,7 @@ int MCP2515::watchFor(uint32_t id, uint32_t mask)
 
 int MCP2515::watchForRange(uint32_t id1, uint32_t id2)
 {
-	uint32_t id = 0;
+	uint32_t id   = 0;
 	uint32_t mask = 0;
 	uint32_t temp;
 
